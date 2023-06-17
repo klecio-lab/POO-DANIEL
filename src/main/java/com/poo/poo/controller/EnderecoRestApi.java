@@ -1,44 +1,41 @@
 package com.poo.poo.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.poo.poo.dto.EnderecoDTO;
 import com.poo.poo.model.Endereco;
-import com.poo.poo.repository.RepositorioEndereco;
+import com.poo.poo.service.EnderecoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/endereco")
-public class EnderecoRestApi  {
+public class EnderecoRestApi {
+
+  private final EnderecoService enderecoService;
+
   @Autowired
-  private RepositorioEndereco repositorio;
+  public EnderecoRestApi(EnderecoService enderecoService) {
+    this.enderecoService = enderecoService;
+  }
 
   @GetMapping
-  public List<Endereco>listar(){
-    return repositorio.findAll();
+  public List<EnderecoDTO> listar() {
+    return enderecoService.listarEnderecos();
   }
 
   @PostMapping
-  public void salvar(@RequestBody Endereco endereco){
-    repositorio.save(endereco);
+  public void salvar(@RequestBody EnderecoDTO enderecoDTO) {
+    enderecoService.salvarEndereco(enderecoDTO);
   }
 
   @PutMapping
-  public void alterar(@RequestBody Endereco endereco){
-    if (endereco.getId() != null && endereco.getId() > 0) {
-      repositorio.save(endereco);
-    }
+  public void alterar(@RequestBody EnderecoDTO enderecoDTO) {
+    enderecoService.alterarEndereco(enderecoDTO);
   }
 
-  @DeleteMapping
-  public void excluir(@RequestBody Endereco endereco){
-    repositorio.delete(endereco);
+  @DeleteMapping("/{id}")
+  public void excluir(@PathVariable("id") Long enderecoId) {
+    enderecoService.excluirEndereco(enderecoId);
   }
 }
