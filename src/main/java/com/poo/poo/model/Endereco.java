@@ -86,12 +86,14 @@ public class Endereco {
     this.cep = cep;
   }
 
-  public Usuario getContato() {
+  public Usuario getUsuario() {
     return usuario;
   }
 
-  public void setContato(Usuario contusuarioato) {
+  public void setUsuario(Usuario usuario) {
     this.usuario = usuario;
   }
 
 }
+
+

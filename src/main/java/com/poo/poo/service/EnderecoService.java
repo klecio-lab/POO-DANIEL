@@ -1,12 +1,15 @@
 package com.poo.poo.service;
 
-//import com.poo.poo.dto.EnderecoDTO;
+
 import com.poo.poo.dto.EnderecoDTO;
 import com.poo.poo.model.Endereco;
+//import com.poo.poo.model.Usuario;
+import com.poo.poo.model.Usuario;
 import com.poo.poo.repository.RepositorioEndereco;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.poo.poo.repository.RepositorioUsuario;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,23 +18,54 @@ import java.util.stream.Collectors;
 @Service
 public class EnderecoService {
     private final RepositorioEndereco repositorioEndereco;
+    private final RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public EnderecoService(RepositorioEndereco repositorioEndereco) {
+    public EnderecoService(RepositorioEndereco repositorioEndereco, RepositorioUsuario repositorioUsuario) {
         this.repositorioEndereco = repositorioEndereco;
+        this.repositorioUsuario = repositorioUsuario;
     }
+
+
+
+
+
+
+
+
 
     public List<EnderecoDTO> listarEnderecos() {
         List<Endereco> enderecos = repositorioEndereco.findAll();
         return enderecos.stream()
-                .map(this::convertToDTO)
+                .map(this::convertToDTOWithUsuarioId)
                 .collect(Collectors.toList());
     }
 
+    private EnderecoDTO convertToDTOWithUsuarioId(Endereco endereco) {
+        EnderecoDTO enderecoDTO = new EnderecoDTO();
+        BeanUtils.copyProperties(endereco, enderecoDTO);
+        if (endereco.getUsuario() != null) {
+            enderecoDTO.setUsuarioId(endereco.getUsuario().getId());
+        }
+        return enderecoDTO;
+    }
+
+
     public void salvarEndereco(EnderecoDTO enderecoDTO) {
         Endereco endereco = convertToEntity(enderecoDTO);
+
+        if (enderecoDTO.getUsuarioId() != null) {
+            Optional<Usuario> optionalUsuario = repositorioUsuario.findById(enderecoDTO.getUsuarioId());
+            if (optionalUsuario.isPresent()) {
+                Usuario usuario = optionalUsuario.get();
+                endereco.setUsuario(usuario);
+            }
+        }
+
         repositorioEndereco.save(endereco);
     }
+
+
 
     public void alterarEndereco(EnderecoDTO enderecoDTO) {
         Long enderecoId = enderecoDTO.getId();
