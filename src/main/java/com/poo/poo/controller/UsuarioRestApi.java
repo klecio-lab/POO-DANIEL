@@ -1,44 +1,42 @@
 package com.poo.poo.controller;
 
-import java.util.List;
 
+
+import com.poo.poo.dto.UsuarioDto;
+import com.poo.poo.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.poo.poo.model.Usuario;
-import com.poo.poo.repository.RepositorioUsuario;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioRestApi {
+
+  private final UsuarioService usuarioService;
+
   @Autowired
-  private RepositorioUsuario repositorio;
+  public UsuarioRestApi(UsuarioService usuarioService) {
+    this.usuarioService = usuarioService;
+  }
 
   @GetMapping
-  public List<Usuario>listar(){
-    return repositorio.findAll();
+  public List<UsuarioDto> listar() {
+    return usuarioService.listarUsuarios();
   }
 
   @PostMapping
-  public void salvar(@RequestBody Usuario usuario){
-    repositorio.save(usuario);
+  public void salvar(@RequestBody UsuarioDto usuarioDto) {
+    usuarioService.salvarUsuario(usuarioDto);
   }
 
   @PutMapping
-  public void alterar(@RequestBody Usuario usuario){
-    if(usuario.getId() > 0){
-      repositorio.save(usuario);
-    }
+  public void alterar(@RequestBody UsuarioDto usuarioDto) {
+    usuarioService.alterarUsuario(usuarioDto);
   }
 
-  @DeleteMapping
-  public void excluir(@RequestBody Usuario usuario){
-    repositorio.delete(usuario);
+  @DeleteMapping("/{id}")
+  public void excluir(@PathVariable("id") Long usuarioId) {
+    usuarioService.excluirUsuario(usuarioId);
   }
 }
